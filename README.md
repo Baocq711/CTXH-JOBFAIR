@@ -1,6 +1,8 @@
-`npm i `
+# npm i
 
-`Vào file src/firebase.ts điền vào các thông tin trong firebaseConfig`
+# Vào src
+
+# Vào file firebase.ts, listUnit điền vào các thông tin trong firebaseConfig, các đơn vị
 
 # npm run dev
 

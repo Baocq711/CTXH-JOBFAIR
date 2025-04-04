@@ -5,7 +5,6 @@ import right from "./assets/6.png";
 import NumberFlow from "@number-flow/react";
 import { onValue } from "firebase/database";
 import { usersRef } from "./firebase";
-import { Button } from "antd";
 
 interface User {
   id?: string;
