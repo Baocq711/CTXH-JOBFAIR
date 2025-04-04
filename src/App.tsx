@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import "./App.css";
 import { onValue, push, ref, update } from "firebase/database";
 import { db, usersRef } from "./firebase";
 import Modal from "./components/modal";
@@ -26,7 +25,6 @@ export default function AttendanceSystem() {
     const unsubscribe = onValue(usersRef, (snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.val();
-        console.log(data);
 
         if (data) {
           // Chuyển object sang mảng:
@@ -34,7 +32,6 @@ export default function AttendanceSystem() {
             id,
             ...(value as User),
           }));
-          console.log(userList);
           setUsers(userList);
         }
       } else {
@@ -47,7 +44,6 @@ export default function AttendanceSystem() {
   }, []);
 
   const handleCheckIn = () => {
-    console.log(users);
     const userUpdated = users.filter((user) => user.mssv === idInput);
     if (userUpdated.length === 0) {
       api.error({
@@ -112,6 +108,7 @@ export default function AttendanceSystem() {
               onChange={(e) => setIdInput(e.target.value)}
               placeholder="Nhập mã số cán bộ hoặc mã số sinh viên vào đây"
               className="w-full px-4 py-3 border border-blue-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onKeyDown={(e) => e.key === "Enter" && handleCheckIn()}
             />
           </div>
           <div className="flex justify-center gap-2">
@@ -143,17 +140,25 @@ export default function AttendanceSystem() {
                 <th className="py-3 px-4 text-left border-b">Họ và tên</th>
                 <th className="py-3 px-4 text-left border-b">Email</th>
                 <th className="py-3 px-4 text-left border-b">Đơn vị</th>
+                <th className="py-3 px-4 text-left border-b">Điểm danh</th>
               </tr>
             </thead>
             <tbody>
-              {users.map((item) => (
-                <tr key={item.mssv} className="hover:bg-gray-200">
-                  <td className="py-3 px-4 border-b">{item.mssv}</td>
-                  <td className="py-3 px-4 border-b">{item.name}</td>
-                  <td className="py-3 px-4 border-b">{item.email}</td>
-                  <td className="py-3 px-4 border-b">{item.unit}</td>
-                </tr>
-              ))}
+              {users.map((item) => {
+                console.log(item);
+                // if (item.isChecked)
+                return (
+                  <tr key={item.mssv} className="hover:bg-gray-200">
+                    <td className="py-3 px-4 border-b">{item.mssv}</td>
+                    <td className="py-3 px-4 border-b">{item.name}</td>
+                    <td className="py-3 px-4 border-b">{item.email}</td>
+                    <td className="py-3 px-4 border-b">{item.unit}</td>
+                    <td className="py-3 px-4 border-b">
+                      {item.isChecked ? "Đã điểm danh" : "Chưa điểm danh"}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

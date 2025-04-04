@@ -1,6 +1,8 @@
+import { AutoComplete, AutoCompleteProps, Input } from "antd";
 import type React from "react";
 
 import { useState } from "react";
+import listUnit from "../listUnit";
 
 interface User {
   id?: string;
@@ -26,8 +28,8 @@ export default function CreateUserForm({
     mssv: "",
     name: "",
     unit: "",
-    isChecked: false,
   });
+  const [options, setOptions] = useState<AutoCompleteProps["options"]>([]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -38,14 +40,14 @@ export default function CreateUserForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const { mssv, name, email, unit, isNew } = userData;
+    const { mssv, name, email, unit } = userData;
     const isSuccess = onSubmit({
       mssv,
       name,
       email,
       unit,
       isChecked: true,
-      isNew,
+      isNew: true,
     });
     if (isSuccess)
       setUserData({
@@ -53,7 +55,6 @@ export default function CreateUserForm({
         mssv: "",
         name: "",
         unit: "",
-        isNew: false,
       });
   };
 
@@ -67,13 +68,18 @@ export default function CreateUserForm({
       mssv: "",
       name: "",
       unit: "",
-      isNew: false,
     });
   };
 
-  const handleIsNew = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target;
-    setUserData((prev) => ({ ...prev, [name]: checked }));
+  const getPanelValue = (searchText: string) => {
+    if (!searchText) return [];
+    return listUnit
+      ?.filter(
+        (item) =>
+          typeof item.value === "string" &&
+          item.value.toLowerCase().includes(searchText.toLowerCase())
+      )
+      .map((item) => ({ value: item.value }));
   };
 
   return (
@@ -85,14 +91,14 @@ export default function CreateUserForm({
         >
           Mã số sinh viên
         </label>
-        <input
+        <Input
           type="text"
           id="mssv"
           name="mssv"
           value={userData.mssv}
           onChange={handleChange}
           required
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex py-2"
           placeholder="Nhập mã số cán bộ hoặc sinh viên"
         />
       </div>
@@ -104,14 +110,14 @@ export default function CreateUserForm({
         >
           Họ và tên
         </label>
-        <input
+        <Input
           type="text"
           id="name"
           name="name"
           value={userData.name}
           onChange={handleChange}
           required
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex py-2"
           placeholder="Nhập họ và tên"
         />
       </div>
@@ -123,14 +129,14 @@ export default function CreateUserForm({
         >
           Email
         </label>
-        <input
+        <Input
           type="text"
           id="email"
           name="email"
           value={userData.email}
           onChange={handleChange}
           required
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex py-2"
           placeholder="Nhập email"
         />
       </div>
@@ -142,31 +148,23 @@ export default function CreateUserForm({
         >
           Đơn vị
         </label>
-        <input
-          type="text"
+        <AutoComplete
           id="unit"
-          name="unit"
           value={userData.unit}
-          onChange={handleChange}
-          required
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Nhập họ và tên"
-        />
-      </div>
-      <div>
-        <label
-          htmlFor="isNew"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Đã có trong danh sách
-        </label>
-        <input
-          type="checkbox"
-          id="isNew"
-          name="isNew"
-          checked={userData.isNew || false}
-          onChange={handleIsNew}
-          className="w-5 h-5 flex absolute -translate-y-[22px] translate-x-[152px] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          options={options}
+          onChange={(value) =>
+            setUserData((prev) => ({ ...prev, unit: value }))
+          }
+          onSearch={(text) => setOptions(getPanelValue(text))}
+          onSelect={(value) =>
+            setUserData((prev) => ({ ...prev, unit: value }))
+          }
+          className="flex h-10"
+          placeholder="Nhập đơn vị"
+          popupMatchSelectWidth={false}
+          getPopupContainer={(trigger) =>
+            trigger.parentElement || document.body
+          }
         />
       </div>
 
